@@ -7,12 +7,14 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
 import br.com.eduardo.entity.Sessao;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class SessaoDTO {
 	
 	private Long id;

@@ -1,6 +1,7 @@
 package br.com.eduardo.scheduller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.amqp.core.AmqpTemplate;
@@ -32,7 +33,7 @@ public class EnviarVotosFinalizados {
 		LocalDateTime inicio = LocalDateTime.now();
 		LocalDateTime fim = LocalDateTime.now().minusDays(1L);
 
-		List<Sessao> findAllByFimBetween = sessaoService.findAllByFimBetween(inicio, fim);
+		List<Sessao> findAllByFimBetween = new ArrayList(); //.findAllByFimBetween(inicio, fim);
 
 		for (Sessao s : findAllByFimBetween) {
 

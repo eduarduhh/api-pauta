@@ -27,9 +27,6 @@ public class VotacaoService implements IGenericService<Votacao> {
 	private VotacaoRepository votacaoRepository;
 
 	@Autowired
-	private SessaoService sessaoService;
-
-	@Autowired
 	private AssociadoService associadoService;
 	
 	@Autowired
@@ -73,7 +70,7 @@ public class VotacaoService implements IGenericService<Votacao> {
 
 	public ResultadoVotoDTO resultadoVotacao(Long idSessao) {
 		
-		Sessao sessao = sessaoService.findSessaoComVotos(idSessao);
+		Sessao sessao = new Sessao();
 		
 		LocalDateTime dateTime = LocalDateTime.now();
 		
@@ -101,7 +98,7 @@ public class VotacaoService implements IGenericService<Votacao> {
 			throw new BusinessException("voto somente SIM ou NÃO" +  (!dto.getVoto().equals("SIM") || !dto.getVoto().equals("NÃO")));
 		}
 
-		Sessao sessao = sessaoService.findByIdAndIndicExclusao(dto.getIdSessao(), false);
+		Sessao sessao = new Sessao();// sessaoService.findByIdAndIndicExclusao(dto.getIdSessao(), false);
 		Associado associado = associadoService.findById(dto.getIdAssociado());
 		
 		
