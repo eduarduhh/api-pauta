@@ -1,19 +1,21 @@
-package br.com.eduardo.dto;
+package br.com.eduardo.clients;
+
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
+@Data
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
+@Getter
 @Builder
-public class VotoDTO {
+public class CpfResponse {
 	
-	private Long idAssociado;
-	private Long idSessao;
-	private String cpf;
-	private String voto;
-	
+	private String status;
+
 }

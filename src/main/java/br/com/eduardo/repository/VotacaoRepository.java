@@ -12,8 +12,8 @@ public interface VotacaoRepository extends JpaRepository<Votacao, Long> {
 	
 	
 	
-	Optional<Votacao> findByAssociadoIdAndSessaoId(Long associadoId, Long sessaoId);
-	
+	Optional<Votacao> findByCpfAndSessaoId(String cpf, Long sessaoId);
+		
 	Optional<Votacao> findBySessaoId(Long sessaoId);
 	
 

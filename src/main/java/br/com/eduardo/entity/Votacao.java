@@ -9,6 +9,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,36 +17,19 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Votacao implements Serializable {
-
-
-
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 	
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	private String cpf;
+	private Boolean voto;
 	
 	@ManyToOne
 	private Sessao sessao;
 	
-	@ManyToOne
-	private Associado associado;
-	
-	private Boolean voto;
-	
-	
-	
-	public Votacao(Sessao sessao, Associado associado, String voto) {
-		
-		this.sessao = sessao;
-		this.associado = associado;
-		this.voto = voto.equals("SIM") ? true : false;
-		
-	}
 	
 }

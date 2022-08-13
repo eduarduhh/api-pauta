@@ -25,21 +25,12 @@ public class PautaController {
 	@GetMapping
 	@ApiOperation(value = "Listagem de pauta")
 	public ResponseEntity<?> findAll() {
-		return new ResponseEntity<>(pautaService.findAllByIndicExclusao(false), HttpStatus.OK);
-
+		return new ResponseEntity<>(pautaService.findAll(), HttpStatus.OK);
 	}
 
 	@PostMapping
 	@ApiOperation(value = "Salvar pauta")
 	public ResponseEntity<?> save(@RequestBody Pauta pauta) {
-
-		pautaService.cadaastrado(pauta.getDescricao());
-
-		pauta.setId(null);
-		pauta.setIndicExclusao(false);
-		Pauta save = pautaService.save(pauta);
-
-		return new ResponseEntity<Pauta>(save, HttpStatus.CREATED);
-
+		return new ResponseEntity<Pauta>(pautaService.save(pauta), HttpStatus.CREATED);
 	}
 }

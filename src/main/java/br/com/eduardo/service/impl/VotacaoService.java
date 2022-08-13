@@ -1,94 +1,64 @@
 package br.com.eduardo.service.impl;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import br.com.eduardo.clients.CPFClient;
+import br.com.eduardo.clients.CpfResponse;
 import br.com.eduardo.dto.ResultadoVotoDTO;
 import br.com.eduardo.dto.VotoDTO;
-import br.com.eduardo.entity.Associado;
 import br.com.eduardo.entity.Sessao;
 import br.com.eduardo.entity.Votacao;
 import br.com.eduardo.exception.BusinessException;
-import br.com.eduardo.exception.NotFoundException;
-import br.com.eduardo.integration.CpfService;
+import br.com.eduardo.repository.SessaoRepository;
 import br.com.eduardo.repository.VotacaoRepository;
-import br.com.eduardo.service.IGenericService;
 
 @Service
-public class VotacaoService implements IGenericService<Votacao> {
+public class VotacaoService  {
 
-	private static final String VOTACAO_NAO_ENCONTRADA = "Votação não encontrada";
 
 	@Autowired
 	private VotacaoRepository votacaoRepository;
-
-	@Autowired
-	private AssociadoService associadoService;
 	
 	@Autowired
-	private CpfService cpfService;
+	private SessaoRepository  sessaoRepository;
+	
+	@Autowired
+	private CPFClient cpfClient;
 
-	@Override
-	public List<Votacao> findAll() {
-		return votacaoRepository.findAll();
-	}
-
-	@Override
-	public Votacao findById(Long id) {
-		return votacaoRepository.findById(id).orElseThrow(() -> new NotFoundException(VOTACAO_NAO_ENCONTRADA));
-	}
-
-	public Votacao findByAssociadoIdAndSessaoId(Long associadoId, Long sessaoId) {
-		return votacaoRepository.findByAssociadoIdAndSessaoId(associadoId, sessaoId)
-				.orElseThrow(() -> new NotFoundException(VOTACAO_NAO_ENCONTRADA));
-	}
-
-	@Override
-	public Votacao save(Votacao t) {
-		return votacaoRepository.save(t);
-	}
-
-	@Override
-	public void delete(Votacao t) {
-		votacaoRepository.delete(t);
-	}
-
-	@Override
-	public long count() {
-		return votacaoRepository.count();
-	}
-
-	@Override
-	public void deleteById(Long id) {
-		votacaoRepository.deleteById(id);
-
-	}
-
+	
 	public ResultadoVotoDTO resultadoVotacao(Long idSessao) {
 		
-		Sessao sessao = new Sessao();
+		Optional<Sessao> sesssionById = sessaoRepository.findById(idSessao);
+		
+		if(!sesssionById.isPresent()) {
+		  throw new BusinessException("Votação já foi encerrada");	
+		}
+		
+		Sessao sessao = sesssionById.get();
 		
 		LocalDateTime dateTime = LocalDateTime.now();
 		
 		if(sessao.getFim().isAfter(dateTime)) {
 			throw new BusinessException("Votação em aberto");
 		}
-		ResultadoVotoDTO dto = new ResultadoVotoDTO();
-		
+	
 		Long votosSIm = sessao.getVotacaos().stream().filter(e -> e.getVoto()).count();
 		Long votosNao = sessao.getVotacaos().stream().filter(e -> !e.getVoto()).count();
-		dto.setIdPauta(sessao.getPauta().getId());
-		dto.setDescricaoPauta(sessao.getPauta().getDescricao());
-		dto.setIdSessao(sessao.getId());
-		dto.setDescricaoSessao(sessao.getDescricao());
-		dto.setInicio(sessao.getInicio());
-		dto.setFim(sessao.getFim());
-		dto.setVotoSim(votosSIm);
-		dto.setVotoNao(votosNao);
+		
+		ResultadoVotoDTO dto = ResultadoVotoDTO.builder().idPauta(sessao.getPauta().getId())
+														 .descricaoPauta(sessao.getPauta().getDescricao())
+														 .idSessao(sessao.getId())
+														 .descricaoSessao(sessao.getDescricao())
+														 .inicio(sessao.getInicio())
+														 .fim(sessao.getFim())
+														 .votoSim(votosSIm)
+														 .votoNao(votosNao)
+														 .build();
+
 		return dto;
 	}
 
@@ -98,26 +68,40 @@ public class VotacaoService implements IGenericService<Votacao> {
 			throw new BusinessException("voto somente SIM ou NÃO" +  (!dto.getVoto().equals("SIM") || !dto.getVoto().equals("NÃO")));
 		}
 
-		Sessao sessao = new Sessao();// sessaoService.findByIdAndIndicExclusao(dto.getIdSessao(), false);
-		Associado associado = associadoService.findById(dto.getIdAssociado());
+		Optional<Sessao> sesssionById = sessaoRepository.findById(dto.getIdSessao());
+		
+		if(!sesssionById.isPresent()) {
+		  throw new BusinessException("Votação já foi encerrada");	
+		}
 		
 		
 		LocalDateTime dateTime = LocalDateTime.now();
+		CpfResponse cpfResponse = cpfClient.getCpf(dto.getCpf());
 		
-		cpfService.isAbleToVote(associado.getCpf());
+		Sessao sessao = sesssionById.get();
 		
 		if (sessao.getFim().isAfter(dateTime)) {
 			throw new BusinessException("Votação já foi encerrada");	
 		}
 		
+		if(!cpfResponse.getStatus().equals("ABLE_TO_VOTE")) {
+			throw new BusinessException("CPF Invalido");
+		}
 		
-		Optional<Votacao> votado = votacaoRepository.findByAssociadoIdAndSessaoId(dto.getIdAssociado(),dto.getIdSessao());
+		Optional<Votacao> votado = votacaoRepository.findByCpfAndSessaoId(dto.getCpf(),dto.getIdSessao());
 		
 		if(votado.isPresent()) {
 			throw new BusinessException("O associado ja voltou");
 		}
 		
-		Votacao votacao = new Votacao(sessao, associado, dto.getVoto());
+		boolean voto = dto.getVoto().equals("SIM") ? true : false;
+		
+		Votacao votacao = Votacao.builder()
+								 .cpf(dto.getCpf())
+								 .sessao(sessao)
+								 .voto(voto)
+								 .build();
+		
 		votacaoRepository.save(votacao);
 	}
 
