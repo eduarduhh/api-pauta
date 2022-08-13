@@ -10,7 +10,6 @@ import br.com.eduardo.entity.Pauta;
 import br.com.eduardo.exception.BusinessException;
 import br.com.eduardo.exception.NotFoundException;
 import br.com.eduardo.repository.PautaRepository;
-import br.com.eduardo.service.IGenericService;
 
 @Service
 public class PautaService  {
