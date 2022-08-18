@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonProperty.Access;
 
-import br.com.eduardo.entity.Sessao;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,11 +25,4 @@ public class SessaoDTO {
 	private Long idPauta;
 	
 	
-	public SessaoDTO(Sessao sessao) {
-		this.id = sessao.getId();
-		this.descricao = sessao.getDescricao();
-		this.idPauta = sessao.getPauta().getId();
-		this.inicio = sessao.getInicio();
-		this.fim  = sessao.getFim();
-	}
 }

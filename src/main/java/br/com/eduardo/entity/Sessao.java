@@ -14,6 +14,7 @@ import javax.persistence.OneToMany;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Entity
 @Data
+@Builder
 public class Sessao implements Serializable {
 
 	
@@ -43,14 +45,5 @@ public class Sessao implements Serializable {
 	private List<Votacao> votacaos;
 	
 	
-	public Sessao(String descricao, Pauta pauta) {
-		this.descricao = descricao;
-		this.pauta = pauta;
-		this.indicExclusao = false;
-		LocalDateTime  data = LocalDateTime.now();
-	    this.inicio = data;
-	    this.fim = data.minusDays(1);
-	   
-	}
 
 }

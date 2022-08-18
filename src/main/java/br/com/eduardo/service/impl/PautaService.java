@@ -14,8 +14,8 @@ import br.com.eduardo.repository.PautaRepository;
 @Service
 public class PautaService  {
 	
-	private static final String PAUTA_NAO_ENCONTRADA = "Pauta Não encontrada";
-	private static final String PAUTA_JA_CADASTRADA = "Pauta ja cadastrada";
+	public static final String PAUTA_NAO_ENCONTRADA = "Pauta Não encontrada";
+	public static final String PAUTA_JA_CADASTRADA = "Pauta ja cadastrada";
 
 
 	@Autowired
@@ -32,7 +32,6 @@ public class PautaService  {
 	
 
 	public Pauta save(Pauta pauta) {
-		
 		Optional<Pauta> findByDescricao = pautaRepository.findByDescricao(pauta.getDescricao());
 		pauta.setId(null);
 		if(findByDescricao.isPresent()) {
@@ -41,5 +40,6 @@ public class PautaService  {
 	
 		return pautaRepository.save(pauta);
 	}
+	
 	
 }

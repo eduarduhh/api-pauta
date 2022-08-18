@@ -1,5 +1,6 @@
 package br.com.eduardo.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import br.com.eduardo.dto.SessaoDTO;
 import br.com.eduardo.entity.Pauta;
 import br.com.eduardo.entity.Sessao;
-import br.com.eduardo.exception.BusinessException;
 import br.com.eduardo.exception.NotFoundException;
 import br.com.eduardo.repository.PautaRepository;
 import br.com.eduardo.repository.SessaoRepository;
@@ -26,10 +26,17 @@ public class SessaoService {
 
 	public List<SessaoDTO> findAllSessaoDTO() {
 		List<SessaoDTO> sessaoDTOs = new ArrayList<>();
-		List<Sessao> sessaos = sessaoRepository.findAllByIndicExclusao(false);
+		
+		List<Sessao> sessaos = sessaoRepository.findAll();
 
 		for (Sessao s : sessaos) {
-			sessaoDTOs.add(new SessaoDTO(s));
+			SessaoDTO dto = SessaoDTO.builder().
+					        id(s.getId())
+					        .descricao(s.getDescricao())
+					        .idPauta(s.getPauta().getId())
+					         .inicio(s.getInicio()).fim(s.getFim()).build();
+
+			sessaoDTOs.add(dto);
 		}
 
 		return sessaoDTOs;
@@ -43,16 +50,18 @@ public class SessaoService {
 			throw new NotFoundException("Pauta não encontrada");
 		}
 
-		Optional<Sessao> oSessao = sessaoRepository.findByDescricao(sessaoDTO.getDescricao());
+		LocalDateTime data = LocalDateTime.now();
 
-		if (!oSessao.isPresent()) {
-			Sessao sessao = new Sessao(sessaoDTO.getDescricao(), pauta.get());
-			Sessao sessaoRetorno = sessaoRepository.save(sessao);
-			SessaoDTO dto = new SessaoDTO(sessaoRetorno);
-			return dto;
-		}
+		Sessao sessao = Sessao.builder().descricao(sessaoDTO.getDescricao()).pauta(pauta.get()).indicExclusao(false)
+				.inicio(data).fim(data.minusDays(1)).build();
 
-		throw new BusinessException("Sessão já encontrada");
+		Sessao sessaoRetorno = sessaoRepository.save(sessao);
+
+		SessaoDTO dto = SessaoDTO.builder().id(sessaoRetorno.getId()).descricao(sessaoRetorno.getDescricao())
+				.idPauta(sessaoRetorno.getPauta().getId()).inicio(sessaoRetorno.getInicio()).fim(sessaoRetorno.getFim())
+				.build();
+		return dto;
+
 	}
 
 }

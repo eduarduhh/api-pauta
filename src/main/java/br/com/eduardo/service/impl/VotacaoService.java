@@ -65,13 +65,13 @@ public class VotacaoService  {
 	public void votar(VotoDTO dto) {
 
 		if (!dto.getVoto().equals("SIM") && !dto.getVoto().equals("NÃO")) {
-			throw new BusinessException("voto somente SIM ou NÃO" +  (!dto.getVoto().equals("SIM") || !dto.getVoto().equals("NÃO")));
+			throw new BusinessException("voto somente SIM ou NÃO");
 		}
 
 		Optional<Sessao> sesssionById = sessaoRepository.findById(dto.getIdSessao());
 		
 		if(!sesssionById.isPresent()) {
-		  throw new BusinessException("Votação já foi encerrada");	
+		  throw new BusinessException("Sessão não encontrada");	
 		}
 		
 		

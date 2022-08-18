@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class VotoDTO {
 	
-	private Long idAssociado;
 	private Long idSessao;
 	private String cpf;
 	private String voto;
